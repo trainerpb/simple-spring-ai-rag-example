@@ -81,6 +81,7 @@ source.onmessage = function(event) {
               chatMessages.scrollTop = chatMessages.scrollHeight;
 }
  assistantBubbleDiv.textContent +=' '+ event.data;
+ speakStreamedText(event.data);
 };
 
 source.onerror = function(err) {
@@ -99,6 +100,29 @@ inputField.addEventListener("keydown", function(event) {
    sendButton.click();
   }
 });
+
+let buffer = "";
+
+function speakStreamedText(textChunk) {
+
+
+  buffer += textChunk;
+
+  // Check for sentence-ending punctuation
+  const match = buffer.match(/(.+?[.!?])(\s|$)/);
+  console.log("match ===>"+match);
+  if (match) {
+    const sentence = match[1];
+    const utterance = new SpeechSynthesisUtterance(textChunk);
+  utterance.lang = 'en-US'; // or 'hi-IN' for Hindi
+  utterance.rate = 1;       // speed (0.1 to 10)
+  utterance.pitch = 1;      // voice pitch (0 to 2)
+  speechSynthesis.speak(utterance);
+    buffer = buffer.slice(match[0].length); // remove spoken part
+  }
+
+
+}
 </script>
 </body>
 </html>
