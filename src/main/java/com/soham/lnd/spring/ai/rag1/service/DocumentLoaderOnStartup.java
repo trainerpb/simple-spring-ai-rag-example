@@ -5,13 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Component
-
+@ConditionalOnProperty(value = "app.ai.pdf.simple")
 public class DocumentLoaderOnStartup implements CommandLineRunner {
     private final VectorStore vectorStore;
 

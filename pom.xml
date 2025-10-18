@@ -16,16 +16,36 @@
 	<description>A simple-spring-ai-rag-example </description>
 	<url/>
 	<licenses>
-		<license/>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<id>trainerpb</id>
+			<name>Soham Sengupta</name>
+			<email>sohamsironline@gmail.com</email>
+			<url>https://github.com/trinerpb</url>
+			<organization>Personal </organization>
+			<organizationUrl>https://in.linkedin.com/in/soham-sengupta-37279825</organizationUrl>
+			<roles>
+				<role>Architect</role>
+				<role>Developer</role>
+				<role>Mentor</role>
+				<role>Researcher</role>
+			</roles>
+			<timezone>+5.5</timezone>
+		</developer>
+
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:https://github.com/trainerpb/simple-spring-ai-rag-example</connection>
+		<developerConnection>scm:git:ssh://git@github.com:trainerpn/simple-spring-ai-rag-example.git</developerConnection>
+		<url>https://github.com/soham-sengupta/spring-ai-demo</url>
+		<tag>HEAD</tag>
 	</scm>
 	<properties>
 		<java.version>17</java.version>
@@ -52,11 +72,25 @@
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>2.9.0</version>
+		</dependency>
 
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parsers-standard-package</artifactId>
+			<version>2.9.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

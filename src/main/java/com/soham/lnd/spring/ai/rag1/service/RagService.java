@@ -4,6 +4,7 @@ package com.soham.lnd.spring.ai.rag1.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -27,14 +28,17 @@ import java.util.stream.Collectors;
 public class RagService {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
+    private final QuestionAnswerAdvisor questionAnswerAdvisor;
 
     @Value("classpath:/prompt/rag-prompt.st")
     private Resource promptResource;
 
-    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore) {
+    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, QuestionAnswerAdvisor questionAnswerAdvisor) {
         this.chatClient = chatClientBuilder.build();
         this.vectorStore = vectorStore;
+        this.questionAnswerAdvisor = questionAnswerAdvisor;
     }
+
 
     public String retrieveAndGenerate(String msg){
         SearchRequest searchRequest = SearchRequest.builder().query(msg).topK(3).build();
@@ -50,6 +54,7 @@ public class RagService {
 
 
     public Flux<String> retrieveAndGenerateStreming(String msg){
+
         SearchRequest searchRequest = SearchRequest.builder().query(msg).topK(3).build();
 
         return Mono.fromCallable(()->{
@@ -69,4 +74,31 @@ public class RagService {
 
 
     }
+
+    public Flux<String> retrieveAndGenerateStremingWithAdvisor(String msg){
+
+
+        SearchRequest searchRequest = SearchRequest.builder().query(msg).topK(3).build();
+
+        return Mono.fromCallable(()->{
+                    List<Document> similaritySearchDocuments = vectorStore.similaritySearch(searchRequest);
+                    String informationAsString = similaritySearchDocuments.stream().map(Document::getText).collect(Collectors.joining("\n"));
+                    SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(promptResource);
+                    var prompt= new Prompt(List.of(systemPromptTemplate.createMessage(Map.of("information",informationAsString)),
+                            new UserMessage(msg)
+                    ));
+                    var output= chatClient.prompt(prompt)
+
+
+                            .stream().content();
+                    return output;
+
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMapMany(flux -> flux);
+
+
+
+    }
+
 }
