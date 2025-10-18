@@ -10,4 +10,9 @@ public class WebMvcController {
     public String home(){
         return "ChatClient";
     }
+
+    @GetMapping("/qr-scanner")
+    public String qrScanner(){
+        return "QR-Scanner";
+    }
 }
