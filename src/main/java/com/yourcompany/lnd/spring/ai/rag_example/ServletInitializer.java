@@ -1,4 +1,4 @@
-package com.soham.lnd.spring.ai.rag1;
+package com.yourcompany.lnd.spring.ai.rag_example;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

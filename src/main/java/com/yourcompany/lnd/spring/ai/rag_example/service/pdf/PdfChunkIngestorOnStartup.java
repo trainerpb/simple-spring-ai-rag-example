@@ -1,5 +1,6 @@
-package com.soham.lnd.spring.ai.rag1.service.pdf;
+package com.yourcompany.lnd.spring.ai.rag_example.service.pdf;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -9,13 +10,14 @@ import java.io.File;
 
 @Component
 @ConditionalOnProperty("app.vector.load-on-start-up")
-public class PdfChunkLoaderOnStartup implements CommandLineRunner {
+@Slf4j
+public class PdfChunkIngestorOnStartup implements CommandLineRunner {
 
     private final String filePath;
 
-    private final PdfChukerService pdfChukerService;
+    private final PDFService pdfChukerService;
 
-    public PdfChunkLoaderOnStartup(@Value("${app.vector.pdf.file-path}") String filePath, PdfChukerService pdfChukerService) {
+    public PdfChunkIngestorOnStartup(@Value("${app.vector.pdf.file-path}") String filePath, PDFService pdfChukerService) {
         this.filePath = filePath;
         this.pdfChukerService = pdfChukerService;
     }
@@ -23,6 +25,6 @@ public class PdfChunkLoaderOnStartup implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
        var documentList= pdfChukerService.saveChunks(new File(filePath));
-        System.out.println("PdfChunkLoaderOnStartup.run :: Added to the vector store : {}"+documentList.size());
+       log.info("PdfChunkLoaderOnStartup.run :: Added to the vector store : {}",documentList.size());
     }
 }

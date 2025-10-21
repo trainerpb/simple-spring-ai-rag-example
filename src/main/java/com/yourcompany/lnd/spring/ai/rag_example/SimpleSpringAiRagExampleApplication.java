@@ -1,4 +1,4 @@
-package com.soham.lnd.spring.ai.rag1;
+package com.yourcompany.lnd.spring.ai.rag_example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

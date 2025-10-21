@@ -1,4 +1,4 @@
-package com.soham.lnd.spring.ai.rag1.service.pdf;
+package com.yourcompany.lnd.spring.ai.rag_example.service.pdf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -13,10 +13,10 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class PdfChukerService {
+public class PDFService {
     private  final VectorStore vectorStore;
 
-    public PdfChukerService(VectorStore vectorStore) {
+    public PDFService(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
     }
 
