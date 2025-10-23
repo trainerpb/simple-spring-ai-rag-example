@@ -3,6 +3,8 @@ package com.yourcompany.lnd.spring.ai.rag_example.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
@@ -34,27 +36,57 @@ public class RagService {
         this.vectorStore = vectorStore;
     }
 
-    public Flux<String> retrieveAndGenerateStreaming(String msg){
+    public Flux<String> retrieveAndGenerateStreaming(String msg) {
 
         SearchRequest searchRequest = SearchRequest.builder().query(msg).topK(3).build();
 
-        return Mono.fromCallable(()->{
+        return Mono.fromCallable(() -> {
                     List<Document> similaritySearchDocuments = vectorStore.similaritySearch(searchRequest);
                     String informationAsString = similaritySearchDocuments.stream().map(Document::getText).collect(Collectors.joining("\n"));
                     SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(promptResource);
-                    var prompt= new Prompt(List.of(systemPromptTemplate.createMessage(Map.of("information",informationAsString)),
+                    var prompt = new Prompt(List.of(systemPromptTemplate.createMessage(Map.of("information", informationAsString)),
                             new UserMessage(msg)
                     ));
                     return chatClient.prompt(prompt).stream().content();
 
-        })
+                })
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(flux -> flux);
 
 
-
     }
 
+
+    /**
+     * Improved version with better readability using Advisor in isolation
+     *
+     *
+     * @param msg
+     * @return
+     */
+    public Flux<String> retrieveAndGenerateStreaming_V2(String msg) {
+
+        SearchRequest searchRequest = SearchRequest.builder().query(msg).topK(3).
+                similarityThreshold(0.6).
+                build();
+
+        return Mono.fromCallable(() -> {
+
+
+                    QuestionAnswerAdvisor questionAnswerAdvisor = QuestionAnswerAdvisor.builder(vectorStore).
+                            searchRequest(searchRequest)  // Use this to pass topK and other params , else default will be used
+                            .build();
+
+                    return chatClient.prompt(msg)
+                            .advisors(new SimpleLoggerAdvisor(),questionAnswerAdvisor)
+                            .stream().content();
+
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMapMany(flux -> flux);
+
+
+    }
 
 
 }
