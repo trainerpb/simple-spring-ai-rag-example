@@ -45,3 +45,14 @@ CREATE INDEX ON vector_store USING HNSW (embedding vector_cosine_ops);'
    *  Change IP/hostname if you want to access from a different device as you need
    * Also, your Posgtress and Model configs may be different . Change them dilligently 
  
+# To-Do
+## Features
+- [x] Server sends searchability authorization token & details to client (browser). Client uses this token to make search requests.
+- [x] User may use choose to search from the site
+  - [x] User may be already on the site
+  - [x] User may have closed the tab which is still there in browser history [We do not scope it in this example]
+- [x] The browser plugin sends search requests to the server along with the token
+- [x] Server validates the token and processes the search request
+- [x] Server sends back search results to the browser plugin
+- [x] Browser plugin displays the search results to the user
+- [x] Server may choose to not entertain such a request and provide the feature based on user to user base or priority customers

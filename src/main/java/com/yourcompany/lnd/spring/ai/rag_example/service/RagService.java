@@ -1,6 +1,7 @@
 package com.yourcompany.lnd.spring.ai.rag_example.service;
 
 
+import com.yourcompany.lnd.spring.ai.rag_example.tool.ATestTool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -25,13 +26,15 @@ import java.util.stream.Collectors;
 public class RagService {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
+    private final ATestTool aTestTool;
 
     @Value("classpath:/prompt/rag-prompt.st")
     private Resource promptResource;
 
-    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore) {
+    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, ATestTool aTestTool) {
         this.chatClient = chatClientBuilder.build();
         this.vectorStore = vectorStore;
+        this.aTestTool = aTestTool;
     }
 
     public Flux<String> retrieveAndGenerateStreaming(String msg){
@@ -41,11 +44,14 @@ public class RagService {
         return Mono.fromCallable(()->{
                     List<Document> similaritySearchDocuments = vectorStore.similaritySearch(searchRequest);
                     String informationAsString = similaritySearchDocuments.stream().map(Document::getText).collect(Collectors.joining("\n"));
+                    log.info("RagService.retrieveAndGenerateStreaming :: Retrieved information: {}" , informationAsString);
                     SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(promptResource);
                     var prompt= new Prompt(List.of(systemPromptTemplate.createMessage(Map.of("information",informationAsString)),
                             new UserMessage(msg)
                     ));
-                    return chatClient.prompt(prompt).stream().content();
+                    return chatClient.prompt(prompt)
+                            .tools(aTestTool)
+                            .stream().content();
 
         })
                 .subscribeOn(Schedulers.boundedElastic())
