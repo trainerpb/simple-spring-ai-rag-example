@@ -62,7 +62,7 @@ b Y8D Y888 888P 888 888 ,ee 888 888 888 888 P    Y88D    Y888  ,d Y888 888P 888 
       // Clear input
       inputField.value = '';
 
-      const source = new EventSource('/search/stream?q='+encodeURIComponent(userText));
+      const source = new EventSource('/search/insurance?q='+encodeURIComponent(userText));
 assistantMessageDiv =null;
 assistantBubbleDiv =null;
 source.onmessage = function(event) {

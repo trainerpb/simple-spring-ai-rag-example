@@ -1,4 +1,4 @@
-package com.yourcompany.lnd.spring.ai.rag_example.service.pdf;
+package home.soham.tools.docs.ai.service.pdf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

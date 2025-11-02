@@ -1,13 +1,13 @@
-package com.yourcompany.lnd.spring.ai.rag_example;
+package home.soham.tools.docs.ai;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SimpleSpringAiRagExampleApplication {
+public class DomesticDocsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SimpleSpringAiRagExampleApplication.class, args);
+		SpringApplication.run(DomesticDocsApplication.class, args);
 	}
 
 }

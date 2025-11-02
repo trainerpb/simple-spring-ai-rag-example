@@ -1,9 +1,11 @@
-package com.yourcompany.lnd.spring.ai.rag_example.service;
+package home.soham.tools.docs.ai.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @SpringBootTest
 @Slf4j
@@ -19,4 +21,12 @@ class RagServiceTest {
     }
 
 
+    @Test
+    void queryDatabaseAndAnswerInsuranceDetails() {
+
+            var a = ragService.queryDatabaseAndAnswerInsuranceDetails("list all insurance docs");
+             var responseList = a.collectList().block();
+            log.info("RagServiceTest.queryDatabaseAndAnswerInsuranceDetails: {}", responseList);
+
+    }
 }

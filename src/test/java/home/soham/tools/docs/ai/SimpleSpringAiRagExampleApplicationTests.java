@@ -1,4 +1,4 @@
-package com.yourcompany.lnd.spring.ai.rag_example;
+package home.soham.tools.docs.ai;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
