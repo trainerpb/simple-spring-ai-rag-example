@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Copilot Chat UI</title>
     <link rel="stylesheet"  th:href="@{/css/style.css}" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
 </head>
 <body>
 <h3 style="color: #0078D4"><center>
@@ -80,7 +81,7 @@ source.onmessage = function(event) {
               chatMessages.appendChild(assistantMessageDiv);
               chatMessages.scrollTop = chatMessages.scrollHeight;
 }
- assistantBubbleDiv.textContent +=' '+ event.data;
+ assistantBubbleDiv.innerHTML  = marked.parse(assistantBubbleDiv.innerHTML  + ' '+ event.data);
  speakStreamedText(event.data);
 };
 
@@ -113,7 +114,7 @@ function speakStreamedText(textChunk) {
   console.log("match ===>"+match);
   if (match) {
     const sentence = match[1];
-    const utterance = new SpeechSynthesisUtterance(textChunk);
+    const utterance = new SpeechSynthesisUtterance(buffer);
   utterance.lang = 'en-US'; // or 'hi-IN' for Hindi
   utterance.rate = 1;       // speed (0.1 to 10)
   utterance.pitch = 1;      // voice pitch (0 to 2)
