@@ -41,8 +41,10 @@ b Y8D Y888 888P 888 888 ,ee 888 888 888 888 P    Y88D    Y888  ,d Y888 888P 888 
     const inputField = document.querySelector('.chat-input input');
     const sendButton = document.querySelector('.chat-input button');
     const chatMessages = document.getElementById('chatMessages');
-
+    let source = null;
+    let buffer = "";
     sendButton.addEventListener('click', () => {
+      buffer="";
       const userText = inputField.value.trim();
       if (userText === '') return;
 
@@ -63,9 +65,10 @@ b Y8D Y888 888P 888 888 ,ee 888 888 888 888 P    Y88D    Y888  ,d Y888 888P 888 
       // Clear input
       inputField.value = '';
 
-      const source = new EventSource('/search/stream?q='+encodeURIComponent(userText));
+      source = new EventSource('/search/stream?q='+encodeURIComponent(userText));
 assistantMessageDiv =null;
 assistantBubbleDiv =null;
+
 source.onmessage = function(event) {
     console.log('New message:', event);
     if(null=== assistantMessageDiv){
@@ -81,16 +84,26 @@ source.onmessage = function(event) {
               chatMessages.appendChild(assistantMessageDiv);
               chatMessages.scrollTop = chatMessages.scrollHeight;
 }
- assistantBubbleDiv.innerHTML  = marked.parse(assistantBubbleDiv.innerHTML  + ' '+ event.data);
- speakStreamedText(event.data);
+let chunk=event.data;
+if (!buffer.endsWith(" ") && !chunk.startsWith(" ")) {
+    buffer += " ";
+  }
+
+  buffer += chunk;
+
+    updatePreview(assistantBubbleDiv);
+<!-- speakStreamedText(event.data);-->
 };
 
-source.onerror = function(err) {
-  console.error('SSE error:', err);
-};
+ source.onerror = () => {
+    console.log("\n\n❌ Stream disconnected.");
+    source.close();
+    let buffer = "";
+  };
 source.addEventListener('done', (event) => {
   console.log('Stream ended:', event.data);
   source.close();
+  buffer="";
 });
 
 });
@@ -102,7 +115,7 @@ inputField.addEventListener("keydown", function(event) {
   }
 });
 
-let buffer = "";
+
 
 function speakStreamedText(textChunk) {
 
@@ -123,6 +136,20 @@ function speakStreamedText(textChunk) {
   }
 
 
+}
+
+    function detectDirection(text) {
+    const rtlChars = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+    return rtlChars.test(text) ? 'rtl' : 'ltr';
+}
+
+function updatePreview(preview) {
+    const markdownContent = buffer;
+    const renderedHTML = marked.parse(markdownContent);
+
+    const direction = detectDirection(markdownContent);
+    preview.style.direction = direction;
+    preview.innerHTML = renderedHTML;
 }
 </script>
 </body>
