@@ -1,6 +1,7 @@
 package com.yourcompany.lnd.spring.ai.rag_example.service;
 
 
+import com.yourcompany.lnd.spring.ai.rag_example.service.tool.WebsiteLinkTool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -25,13 +26,15 @@ import java.util.stream.Collectors;
 public class RagService {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
+    private final WebsiteLinkTool websiteLinkTool;
 
     @Value("classpath:/prompt/rag-prompt.st")
     private Resource promptResource;
 
-    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore) {
+    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, WebsiteLinkTool websiteLinkTool) {
         this.chatClient = chatClientBuilder.build();
         this.vectorStore = vectorStore;
+        this.websiteLinkTool = websiteLinkTool;
     }
 
     public Flux<String> retrieveAndGenerateStreaming(String msg){
@@ -45,7 +48,9 @@ public class RagService {
                     var prompt= new Prompt(List.of(systemPromptTemplate.createMessage(Map.of("information",informationAsString)),
                             new UserMessage(msg)
                     ));
-                    return chatClient.prompt(prompt).stream().content();
+                    return chatClient.prompt(prompt)
+                            .tools(websiteLinkTool)
+                            .stream().content();
 
         })
                 .subscribeOn(Schedulers.boundedElastic())

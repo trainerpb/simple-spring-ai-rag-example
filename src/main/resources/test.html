@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Markdown SSE Stream</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 1rem; }
+        #output { white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+<h2>📡 Streaming Markdown via SSE</h2>
+<div id="output">Waiting for Markdown chunks...</div>
+
+<script>
+    const output = document.getElementById("output");
+    const source = new EventSource("http://localhost:8080/search/stream?q=How do i reach ideal college via train");
+
+    source.onmessage = (event) => {
+      const chunk = event.data;
+      const html = chunk;
+     console.log("Received chunk:", chunk+"\t"+html);
+<!--      const div = document.createElement("div");-->
+<!--      div.innerHTML = html;-->
+      output.innerHTML = output.innerHTML + html;
+    };
+
+    source.onerror = () => {
+      output.innerHTML += "\n\n❌ Stream disconnected.";
+      source.close();
+    };
+</script>
+
+</body>
+</html>
