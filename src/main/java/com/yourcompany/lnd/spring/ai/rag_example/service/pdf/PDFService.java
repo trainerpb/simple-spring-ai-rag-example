@@ -24,8 +24,8 @@ public class PDFService {
     }
 
     public List<Document> saveChunks(File file) throws TikaException, IOException {
-//        var chunks=loadChunkPdf(file);
-        var chunks=loadPargaraphwiseStripping(file);
+        var chunks=loadChunkPdf(file);
+//        var chunks=loadPargaraphwiseStripping(file);
         log.info("Obtained chunks size : {}",chunks.size());
         int batch_size=10;
         int batch_count = (int) Math.ceil((double) chunks.size() / batch_size);

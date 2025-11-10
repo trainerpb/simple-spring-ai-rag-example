@@ -11,7 +11,7 @@ import java.util.Map;
 @Data
 public class AppConfig
 {
-    private Map<String, String>  websiteLinks;
+    private Map<String, String> departmentWebsiteLinks;
 
 
 }

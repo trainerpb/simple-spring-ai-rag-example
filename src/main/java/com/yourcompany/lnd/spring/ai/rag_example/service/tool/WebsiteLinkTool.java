@@ -28,7 +28,7 @@ public class WebsiteLinkTool {
             Artificial Intelligence is also known as AI.
             Machine Learning is also known as ML.
             Artificial Intelligence and Machine Learning is also known as AI & ML or AIML
-            """, returnDirect = true)
+            """, returnDirect = false)
     public String getWebsiteLink(@ToolParam(description = """
             Provide the stream of study for which you want to get the official website link.
             Examples: Computer Science, Electrical Engineering, Mechanical Engineering, Civil Engineering, Chemical Engineering, Aerospace Engineering, Biomedical Engineering, BBA, Artificial Intelligence, Machine Learning, AI & ML.
@@ -42,7 +42,7 @@ public class WebsiteLinkTool {
             Artificial Intelligence and Machine Learning is also known as AI & ML or AIML
             
             """) String stream) {
-        String link = appConfig.getWebsiteLinks().getOrDefault(normalizeStreamName(stream), Strings.EMPTY);
+        String link = appConfig.getDepartmentWebsiteLinks().getOrDefault(normalizeStreamName(stream), Strings.EMPTY);
         if (!StringUtils.hasText(link)) {
             log.warn("WebsiteLinkTool.getWebsiteLink :: No link found for stream: {}", stream);
 
@@ -66,7 +66,7 @@ public class WebsiteLinkTool {
             Artificial Intelligence is also known as AI.
             Machine Learning is also known as ML.
             Artificial Intelligence and Machine Learning is also known as AI & ML or AIML
-            """, returnDirect = true)
+            """, returnDirect = false)
     public String visitWebsiteLink(@ToolParam(description = """
             Provide the stream of study for which you want to get the official website link.
             Examples: Computer Science, Electrical Engineering, Mechanical Engineering, Civil Engineering, Chemical Engineering, Aerospace Engineering, Biomedical Engineering, BBA, Artificial Intelligence, Machine Learning, AI & ML.
@@ -80,7 +80,7 @@ public class WebsiteLinkTool {
             Artificial Intelligence and Machine Learning is also known as AI & ML or AIML
             
             """) String stream) {
-        String link = appConfig.getWebsiteLinks().getOrDefault(normalizeStreamName(stream), Strings.EMPTY);
+        String link = appConfig.getDepartmentWebsiteLinks().getOrDefault(normalizeStreamName(stream), Strings.EMPTY);
         return """
                 <button onclick="window.open('%s', '_blank')">
                     Visit the official website for %s </button>

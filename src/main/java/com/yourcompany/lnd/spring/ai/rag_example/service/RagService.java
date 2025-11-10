@@ -27,14 +27,15 @@ public class RagService {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
     private final WebsiteLinkTool websiteLinkTool;
-
+    private final StaticInformationTool staticInformationTool;
     @Value("classpath:/prompt/rag-prompt.st")
     private Resource promptResource;
 
-    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, WebsiteLinkTool websiteLinkTool) {
+    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, WebsiteLinkTool websiteLinkTool, StaticInformationTool staticInformationTool) {
         this.chatClient = chatClientBuilder.build();
         this.vectorStore = vectorStore;
         this.websiteLinkTool = websiteLinkTool;
+        this.staticInformationTool = staticInformationTool;
     }
 
     public Flux<String> retrieveAndGenerateStreaming(String msg){
@@ -49,7 +50,7 @@ public class RagService {
                             new UserMessage(msg)
                     ));
                     return chatClient.prompt(prompt)
-                            .tools(websiteLinkTool)
+                            .tools(staticInformationTool, websiteLinkTool)
                             .stream().content();
 
         })
