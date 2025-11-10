@@ -98,6 +98,7 @@ assistantBubbleDiv =null;
 
 source.onmessage = function(event) {
     console.log('New message:', event);
+    console.warn("Space in  chunk: ", event.data.startsWith(" "), " buffer ends with space: ", event.data.endsWith(" "));
     if(null=== assistantMessageDiv){
                assistantMessageDiv = document.createElement('div');
 

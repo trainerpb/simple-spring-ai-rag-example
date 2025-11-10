@@ -55,7 +55,7 @@ public class StaticInformationTool {
             Example: keyA = "name", keyB = "Principal" (person or entity)
             Example: keyA = "name", keyB = "courses"
             Example: keyA = "name", keyB = "founder"
-            
+            Example: How many students capacity in CSE department means keyA = "intake", keyB = "CSE"
             
             """, returnDirect = true)
     public String getStaticInformation(@ToolParam(description = """
