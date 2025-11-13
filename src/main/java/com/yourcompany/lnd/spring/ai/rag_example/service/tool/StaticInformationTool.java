@@ -1,18 +1,25 @@
-package com.yourcompany.lnd.spring.ai.rag_example.service;
+package com.yourcompany.lnd.spring.ai.rag_example.service.tool;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yourcompany.lnd.spring.ai.rag_example.config.AppConfig;
 import com.yourcompany.lnd.spring.ai.rag_example.model.entity.StaticInfoRequest;
+import com.yourcompany.lnd.spring.ai.rag_example.model.entity.tool.ToolResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class StaticInformationTool {
 
     private final AppConfig appConfig;
-
+private final ObjectMapper objectMapper;
     @Tool(description = "Use this period to Get the current date in YYYY-MM-DD format")
     public String getCurrentDate() {
         return java.time.LocalDate.now().toString();
@@ -55,22 +62,29 @@ public class StaticInformationTool {
             Example: keyA = "name", keyB = "Principal" (person or entity)
             Example: keyA = "name", keyB = "courses"
             Example: keyA = "name", keyB = "founder"
+            Example: Where is Ideal College located? keyA="address", keyB="" 
             Example: How many students capacity in CSE department means keyA = "intake", keyB = "CSE"
             
             """, returnDirect = true)
-    public String getStaticInformation(@ToolParam(description = """
+    public ToolResponse getStaticInformation(@ToolParam(description = """
                                                First level key to access the static information map.
-                                               Example: "name", "intake",  "contact"
+                                               Example: "name", "intake",  "contact", "address"
                                                """) String keyA,
-                                       @ToolParam(description = """
+                                             @ToolParam(description = """
                                                Second level key to access the static information map.
                                                Example: "founders", "ECE", "Principal", "courses"
                                                Example: If keyA is "name", keyB can be "founders" or "Principal" or "courses"
                                                Example: If keyA is "intake", keyB can be "CSE", "ECE", "ME" etc.
                                                """)
-                                       String keyB) {
+                                       String keyB) throws JsonProcessingException {
 
-        return StaticInfoRequest.findByType(appConfig.getInfo(), keyA,keyB).toString() ;
+
+        var result= StaticInfoRequest.findByType(appConfig.getInfo(), keyA,keyB);
+        log.info("Tool call keyA ={} keyB ={} result={} ",keyA,keyB,result);
+        return ToolResponse.builder()
+                .answer(objectMapper.writeValueAsString(result))
+                .tools(List.of("getStaticInformation"))
+                .build();
 
     }
 }

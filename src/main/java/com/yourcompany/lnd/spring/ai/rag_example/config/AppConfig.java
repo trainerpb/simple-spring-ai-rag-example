@@ -1,5 +1,6 @@
 package com.yourcompany.lnd.spring.ai.rag_example.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yourcompany.lnd.spring.ai.rag_example.model.entity.StaticInfoRequest;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,4 +19,9 @@ public class AppConfig
     private Map<String, String> departmentWebsiteLinks;
 
     private Map<String, Map<String, Set<String>>> info = new HashMap<>();
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 }
