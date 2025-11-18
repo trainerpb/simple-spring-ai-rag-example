@@ -6,21 +6,31 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
 @Slf4j
 public class PDFService {
     private  final VectorStore vectorStore;
+    private final VectorStore inMemoryVectorStore;
+    private final EmbeddingModel embeddingModel;
 
-    public PDFService(VectorStore vectorStore) {
+    public PDFService(VectorStore vectorStore, EmbeddingModel embeddingModel) {
         this.vectorStore = vectorStore;
+        this.inMemoryVectorStore =SimpleVectorStore.builder(embeddingModel)
+                .build();
+        this.embeddingModel = embeddingModel;
     }
 
     public List<Document> saveChunks(File file) throws TikaException, IOException {
@@ -103,6 +113,36 @@ public class PDFService {
             throw new RuntimeException(e);
         }
         return paragraphs;
+    }
+
+
+
+    public List<Document> saveChunks(String inputBigText) throws TikaException, IOException {
+//        var chunks=loadChunkPdf(file);
+        List<String> paragraphs = Arrays.stream(inputBigText.split("\\n\\n+"))
+                .map(p -> p.replaceAll("\\n", " ").trim()) // flatten lines within paragraph
+                .filter(p -> p.length() > 100) // skip tiny fragments
+                .toList();
+        log.info("Extracted paragraphs  : {}",paragraphs);
+        List<Document> chunks = paragraphs.stream()
+                .map(Document::new)
+                .toList();
+
+
+        log.info("Obtained chunks size : {}",chunks.size());
+        int batch_size=10;
+        int batch_count = (int) Math.ceil((double) chunks.size() / batch_size);
+        for (int i = 0; i < batch_count; i++) {
+            int start= i * batch_size;
+            int end = Math.min(start + batch_size, chunks.size());
+            List<Document> batch = chunks.subList(start, end);
+            vectorStore.add(batch);
+            log.info("Added batch {} to vector store with size : {}",i+1,batch.size());
+
+        }
+
+        inMemoryVectorStore.add(chunks);
+        return chunks;
     }
 
 }

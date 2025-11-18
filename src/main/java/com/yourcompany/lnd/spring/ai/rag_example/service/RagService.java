@@ -25,13 +25,15 @@ import java.util.stream.Collectors;
 public class RagService {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
+    private final VectorStore inMemoryVectorStore;
 
     @Value("classpath:/prompt/rag-prompt.st")
     private Resource promptResource;
 
-    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore) {
+    public RagService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, VectorStore inMemoryVectorStore) {
         this.chatClient = chatClientBuilder.build();
         this.vectorStore = vectorStore;
+        this.inMemoryVectorStore = inMemoryVectorStore;
     }
 
     public Flux<String> retrieveAndGenerateStreaming(String msg){
@@ -54,6 +56,29 @@ public class RagService {
 
 
     }
+
+
+    public Flux<String> retrieveChromePageAndGenerateStreaming(String msg){
+
+        SearchRequest searchRequest = SearchRequest.builder().query(msg).topK(3).build();
+
+        return Mono.fromCallable(()->{
+                    List<Document> similaritySearchDocuments = inMemoryVectorStore.similaritySearch(searchRequest);
+                    String informationAsString = similaritySearchDocuments.stream().map(Document::getText).collect(Collectors.joining("\n"));
+                    SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(promptResource);
+                    var prompt= new Prompt(List.of(systemPromptTemplate.createMessage(Map.of("information",informationAsString)),
+                            new UserMessage(msg)
+                    ));
+                    return chatClient.prompt(prompt).stream().content();
+
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMapMany(flux -> flux);
+
+
+
+    }
+
 
 
 
