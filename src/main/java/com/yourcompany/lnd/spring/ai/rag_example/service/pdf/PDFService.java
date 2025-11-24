@@ -10,6 +10,8 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -103,6 +105,34 @@ public class PDFService {
             throw new RuntimeException(e);
         }
         return paragraphs;
+    }
+
+
+
+
+    public void renameFilesWithinFolderToAnoterDirectory(File directory,String targetDir) throws TikaException, IOException {
+        int count=0;
+        File[] files = directory.listFiles();
+        for (File fileEntry:files){
+            if(fileEntry.exists() && fileEntry.isFile()){
+                Tika tika = new Tika();
+                String content = tika.parseToString(fileEntry);
+                //The Guardians of 27900124001 SANTOSH KUMAR RAJAK
+                final String PATTERN="The Guardians  of  ";
+                int offset=content.indexOf(PATTERN) +PATTERN.length();
+                String regNo=content.substring(offset,offset+11);
+
+                    String newFileName = regNo +".pdf";
+                File tagetFile=new File(targetDir , newFileName);
+                Files.copy(fileEntry.toPath(),tagetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    log.info("Copied new file name: {} for file: {}",tagetFile,fileEntry.getName());
+                count++;
+            }else{
+                log.warn("Skipping renaming for non file entry : {}",fileEntry.getName());
+            }
+
+            log.info("Total files processed for renaming : {}",count);
+        }
     }
 
 }
